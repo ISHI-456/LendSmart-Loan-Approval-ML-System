@@ -1,7 +1,7 @@
 
 import streamlit as st
 import pickle
-import numpy as np
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,7 +17,10 @@ st.set_page_config(
 
 # ---------------- LOAD MODELS & PREPROCESSORS ----------------
 log_model = pickle.load(open("models/logistic_model.pkl", "rb"))
-
+nb_model = pickle.load(open("models/naive_bayes_model.pkl", "rb"))
+rf_model = pickle.load(open("models/random_forest_model.pkl", "rb"))
+dt_model = pickle.load(open("models/decision_tree_model.pkl", "rb"))
+xgb_model = pickle.load(open("models/xgboost_model.pkl", "rb"))
 scaler = pickle.load(open("models/scaler.pkl", "rb"))
 encoder = pickle.load(open("models/encoder.pkl", "rb"))
 feature_cols = pickle.load(open("models/feature_columns.pkl", "rb"))
@@ -136,14 +139,14 @@ col1, col2 = st.columns(2)
 
 if st.sidebar.button("🔍 Predict Loan Approval"):
     input_scaled = scaler.transform(input_df)
-    log_pred = log_model.predict(input_scaled)[0]
+    xgb_model = xgb_model.predict(input_scaled)[0]
     
     # Display results in columns
     res_col1,res_col2 = st.columns(2)
 
     with res_col1:
-        st.success("Logistic Regression")
-        status = "Approved ✅" if log_pred == 1 else "Rejected ❌"
+        st.success("XGBoost Prediction:")
+        status = "Approved ✅" if xgb_model== 1 else "Rejected ❌"
         st.metric("Status", status)
 
     
@@ -166,11 +169,12 @@ st.subheader("📈 Metrics Visualization")
 
 
 
-fig, ax = plt.subplots(figsize=(5, 4))
+fig, ax = plt.subplots(figsize=(10, 6))
 df_metrics.plot(kind="bar", ax=ax, legend=True)
 ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
 ax.set_ylabel("Score")
-ax.set_title("Logistic Regression Performance")
+ax.set_title("Model Performance Metrics")
+plt.tight_layout()  
 st.pyplot(fig)
 
 

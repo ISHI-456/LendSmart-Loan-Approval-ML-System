@@ -1,5 +1,5 @@
 import pandas as pd
-import numpy as np
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -77,6 +77,32 @@ Lg_model = LogisticRegression()
 
 Lg_model.fit(X_train_scaled,y_train)
 
+#naive bayes
+from sklearn.naive_bayes import GaussianNB
+gb=GaussianNB()
+gb.fit(X_train_scaled,y_train)
+y_pred1=gb.predict(X_test_scaled)
+
+#random forest
+from sklearn.ensemble import RandomForestClassifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train_scaled, y_train)
+y_pred_rf = rf_model.predict(X_test_scaled)
+
+#Decision tree
+from sklearn.tree import DecisionTreeClassifier
+dt_model = DecisionTreeClassifier()
+dt_model.fit(X_train_scaled, y_train)
+y_pred_dt = dt_model.predict(X_test_scaled)
+
+
+#XGBoost
+
+from xgboost import XGBClassifier
+xgb_model = XGBClassifier()
+xgb_model.fit(X_train_scaled, y_train)
+y_pred_xgb = xgb_model.predict(X_test_scaled)
+
 #evaluation (generally for loan approval we give more preference to precsion then to recall score)
 
 from sklearn.metrics import accuracy_score,precision_score,recall_score,confusion_matrix
@@ -94,7 +120,32 @@ metrics = {
         "Precision": precision_score(y_test, Lg_model.predict(X_test_scaled))*100,
         "Recall": recall_score(y_test, Lg_model.predict(X_test_scaled))*100,
         "F1 Score": f1_score(y_test, Lg_model.predict(X_test_scaled))*100,
+    },
+    "Naive Bayes": {
+        "Accuracy": accuracy_score(y_test, y_pred1)*100,
+        "Precision": precision_score(y_test, y_pred1)*100,
+        "Recall": recall_score(y_test, y_pred1)*100,
+        "F1 Score": f1_score(y_test, y_pred1)*100,
+    },
+    "Random Forest": {
+        "Accuracy": accuracy_score(y_test, y_pred_rf)*100,
+        "Precision": precision_score(y_test, y_pred_rf)*100,
+        "Recall": recall_score(y_test, y_pred_rf)*100,
+        "F1 Score": f1_score(y_test, y_pred_rf)*100,
+    },
+    "Decision Tree": {
+        "Accuracy": accuracy_score(y_test, y_pred_dt)*100,
+        "Precision": precision_score(y_test, y_pred_dt)*100,
+        "Recall": recall_score(y_test, y_pred_dt)*100,
+        "F1 Score": f1_score(y_test, y_pred_dt)*100,
+    },
+    "XGBoost": {
+        "Accuracy": accuracy_score(y_test, y_pred_xgb)*100,
+        "Precision": precision_score(y_test, y_pred_xgb)*100,
+        "Recall": recall_score(y_test, y_pred_xgb)*100,
+        "F1 Score": f1_score(y_test, y_pred_xgb)*100,
     }
+
 }
 
 
@@ -120,7 +171,17 @@ loan_data["DTI_Ratio"] = (
 with open("models/logistic_model.pkl", "wb") as f:
     pickle.dump(Lg_model, f)
 
+with open("models/naive_bayes_model.pkl", "wb") as f:
+    pickle.dump(gb, f)
 
+with open("models/random_forest_model.pkl", "wb") as f:
+    pickle.dump(rf_model, f)
+
+with open("models/decision_tree_model.pkl", "wb") as f:
+    pickle.dump(dt_model, f)
+
+with open("models/xgboost_model.pkl", "wb") as f:
+    pickle.dump(xgb_model, f)
 
 with open("models/scaler.pkl", "wb") as f:
     pickle.dump(scaler, f)
